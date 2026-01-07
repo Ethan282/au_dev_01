@@ -5,7 +5,7 @@ import { TestSuite, TestStep, TestStatus } from "../types";
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // Using gemini-3-pro-preview for better reasoning capabilities in test generation
-const MODEL_NAME = "gemini-3-pro-preview";
+const MODEL_NAME = "gemini-1.5-pro";
 
 export const generateTestPlan = async (url: string, username?: string): Promise<TestSuite> => {
   const prompt = `
@@ -59,7 +59,7 @@ export const generateTestPlan = async (url: string, username?: string): Promise<
 
     if (response.text) {
       const data = JSON.parse(response.text);
-      
+
       // Transform into our internal type
       const steps: TestStep[] = data.steps.map((s: any) => ({
         ...s,
@@ -76,7 +76,7 @@ export const generateTestPlan = async (url: string, username?: string): Promise<
         steps: steps
       };
     }
-    
+
     throw new Error("Empty response from AI");
   } catch (error) {
     console.error("Failed to generate test plan:", error);
@@ -86,8 +86,8 @@ export const generateTestPlan = async (url: string, username?: string): Promise<
 
 export const simulateStepExecution = async (step: TestStep, url: string): Promise<{ logs: string[], status: TestStatus }> => {
   // We use a lighter model for quick simulation log generation to reduce latency
-  const SIM_MODEL = "gemini-3-flash-preview"; 
-  
+  const SIM_MODEL = "gemini-1.5-flash";
+
   const prompt = `
     We are simulating the execution of an automation test step: "${step.name}" - "${step.description}"
     Target URL: ${url}
@@ -116,10 +116,10 @@ export const simulateStepExecution = async (step: TestStep, url: string): Promis
         }
       }
     });
-    
+
     const text = response.text;
     if (!text) throw new Error("No text");
-    
+
     const data = JSON.parse(text);
     return {
       logs: data.logs,
